@@ -10,12 +10,11 @@ sub_sh_dims = [1, 25]
 sub_o_dims = 1
 
 # Evolutionary parameters
-goal_fitness=2.98
+goal_fitness=9.0
 pop_key = 0
 pop_size = 150
-pop_elitism = 3
-num_generations = 50
-
+pop_elitism = 25
+num_generations = 7
 
 def get_data(path=None):
     data = []
@@ -29,11 +28,12 @@ def get_data(path=None):
         else:
             cur_line = list(map(lambda x: float(x), cur_line.strip().split()))
             data.append(tuple(cur_line[: 24]))
-            label.append(cur_line[-3])
+            label.append(cur_line[-1] * 2)
+    print('all label:', label)
+    print('all label:', set(label), min(label), max(label))
     return data, label
 
-
-# Define task
+# Define task 定义任务
 def xor(genomes):
 	# xor_inputs = [(0.0,0.0, 1.),(0.0,1.0, 2.),(1.0,0.0, 3.),(1.0,1.0, 6.)]
 	# expected_outputs = [0.0, 1.0, 1.0, 0.0]
@@ -45,9 +45,11 @@ def xor(genomes):
 		substrate = decode(cppn,sub_in_dims,sub_o_dims,sub_sh_dims)
 		sum_square_error = 0.0
 		for inputs, expected in zip(xor_inputs, expected_outputs):
+            # inputs = inputs + (.0,)
 			inputs = inputs + (1.0,)
 			actual_output = substrate.activate(inputs)[0]
-			sum_square_error += ((actual_output - expected)**2.0)/4.0
+            # sum_square_error += ((actual_output - expected)**2.0)/25.0
+			sum_square_error += ((actual_output - expected)**2.0)/len(xor_inputs)
 		genome.fitness = 1.0 - sum_square_error
 
 # Inititalize population
